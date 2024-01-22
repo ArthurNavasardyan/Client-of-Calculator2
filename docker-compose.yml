@@ -1,0 +1,41 @@
+version: '3.4'
+
+
+services:
+  webcalculator2:
+    container_name: Server
+    image: ${DOCKER_REGISTRY-}webcalculator2
+    build:
+      context: .
+      dockerfile: WebCalculator2/Dockerfile
+    depends_on:
+     - db
+
+  signalr_client:
+    container_name: User
+    image: ${DOCKER_REGISTRY-}signalrclient
+    build:
+      context: .
+      dockerfile: SignalR_Client/Dockerfile
+    depends_on:
+      - webcalculator2
+       
+  phpmyadmin:
+    container_name: Interface 
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+  
+  db:
+    container_name: MYSQL
+    image: mysql    
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_DATABASE: EfCoreBasicDb
+      MYSQL_USER: Arthur
+      MYSQL_PASSWORD: 123456
